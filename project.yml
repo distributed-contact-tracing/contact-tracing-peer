@@ -1,0 +1,20 @@
+---
+version: 2.2.0
+configurations:
+  debug:
+    overrides:
+      CODE_SIGN_IDENTITY: "iPhone Developer"
+      FRAMEWORK_SEARCH_PATHS:
+        - $(inherited)
+        - $(PROJECT_DIR)/Carthage/Build/iOS
+  release:
+    overrides:
+      CODE_SIGN_IDENTITY: "iPhone Developer"
+      FRAMEWORK_SEARCH_PATHS:
+        - $(inherited)
+        - $(PROJECT_DIR)/Carthage/Build/iOS
+targets:
+  DistContactTracing:
+    type: ":application"
+    platform: ios
+    sources: src
