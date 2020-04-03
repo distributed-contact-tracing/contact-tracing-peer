@@ -18,6 +18,11 @@
 
 // swiftlint:disable identifier_name line_length nesting type_body_length type_name
 internal enum Asset {
+  internal static let actionBlue = ColorAsset(name: "ActionBlue")
+  internal static let niceRed = ColorAsset(name: "NiceRed")
+  internal static let offBlack = ColorAsset(name: "OffBlack")
+  internal static let offWhite = ColorAsset(name: "OffWhite")
+  internal static let backgroundPeople = ImageAsset(name: "BackgroundPeople")
 }
 // swiftlint:enable identifier_name line_length nesting type_body_length type_name
 

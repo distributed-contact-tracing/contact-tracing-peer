@@ -1,6 +1,8 @@
 name: DistContactTracing
 options:
   bundleIdPrefix: com.dist-contact-tracing.app
+settings:
+  DEVELOPMENT_TEAM: VDQM747B3N
 targets:
   DistContactTracing:
     type: application
