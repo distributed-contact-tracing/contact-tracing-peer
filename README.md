@@ -4,5 +4,5 @@ A peer node application for distributed contact tracing. Running on mobile phone
 # Setup
 1. Install XcodeGen: `brew install xcodegen`
 2. Create project: `xcodegen generate`
-1. Install Swiftgen: `brew install struct`
+1. Install Swiftgen: `brew install swiftgen`
 2. Generate file types: `swiftgen`
