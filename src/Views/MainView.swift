@@ -55,7 +55,7 @@ struct MainView: View {
                         .cornerRadius(10)
                         .foregroundColor(.white)
                     }.frame(maxWidth: .infinity).padding(.vertical, 20).padding(.horizontal, 15)
-            }.sheet(isPresented: self.$falseFalse) {
+            }.sheet(isPresented: self.$showModal) {
                 BTDebugView()
             }
         }

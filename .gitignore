@@ -1,4 +1,7 @@
 dump.rdb
 DistContactTracing.xcodeproj
 DistContactTracing.xcworkspace
+src/GoogleService-Info.plist
 src/Assets/Assets.swift
+Pods
+Podfile.lock

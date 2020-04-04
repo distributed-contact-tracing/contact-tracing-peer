@@ -13,6 +13,8 @@ class ActivePeripheral: Identifiable, ObservableObject {
     @Published var signalStrength: NSNumber?
     let peripheral: CBPeripheral
     let foundTimestamp: Date
+    @Published var sentHandshakeToken: String?
+    @Published var receivedHandshakeToken: String?
     @Published var lastSeenTimestamp: Date
     let id: String
     
