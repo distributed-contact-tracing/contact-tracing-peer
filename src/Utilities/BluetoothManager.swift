@@ -94,12 +94,15 @@ extension BluetoothManager: CBPeripheralDelegate {
     func peripheral( _ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
         for characteristic in service.characteristics! {
             let characteristic = characteristic as CBCharacteristic
-            if (characteristic.uuid.isEqual(WR_UUID)) {
-                let token = TokenManager().createToken()
-                activePeripherals.first(where: { $0.peripheral == peripheral })?.sentHandshakeToken = token
-                
-                if let data = token.data(using: .utf8) {
-                    peripheral.writeValue(data, for: characteristic, type: CBCharacteristicWriteType.withResponse)
+            if let peripheralInstance = activePeripherals.first(where: { $0.peripheral == peripheral }) {
+                if characteristic.uuid.isEqual(WR_UUID) && peripheralInstance.receivedHandshakeToken == nil {
+                    let token = TokenManager().createStringToken()
+                    peripheralInstance.sentHandshakeToken = token
+                    
+                    if let data = token.data(using: .utf8) {
+                        print("👻 Sent token")
+                        peripheral.writeValue(data, for: characteristic, type: CBCharacteristicWriteType.withResponse)
+                    }
                 }
             }
         }

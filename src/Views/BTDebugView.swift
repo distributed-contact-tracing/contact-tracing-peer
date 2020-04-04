@@ -26,6 +26,9 @@ struct PeripheralRow: View {
             Text("Found \(peripheral.foundTimestamp)")
             Text("Last seen \(peripheral.lastSeenTimestamp)")
             Text("Signal strength \(peripheral.signalStrength ?? 0)")
+            Text("Received token: \(peripheral.receivedHandshakeToken ?? "nil")")
+            Text("Sent token: \(peripheral.sentHandshakeToken ?? "nil")")
+            Text("Agreed on sent token: \(peripheral.shouldUseSentToken() ?? false ? "yes" : "no")")
         }
     }
 }

@@ -25,6 +25,21 @@ class ActivePeripheral: Identifiable, ObservableObject {
         self.lastSeenTimestamp = lastSeenTimestamp
         self.id = peripheral.identifier.uuidString
     }
+    
+    func shouldUseSentToken() -> Bool? {
+        if sentHandshakeToken != nil || receivedHandshakeToken != nil {
+            // TODO: Are we sure the sent token is received?
+            guard let sentToken = sentHandshakeToken else { return false }
+            guard let receivedToken = receivedHandshakeToken else { return true }
+            
+            guard let sentTokenObject = TokenManager().tokenFrom(string: sentToken) else { return nil }
+            guard let receivedTokenObject = TokenManager().tokenFrom(string: receivedToken) else { return nil }
+            
+            return sentTokenObject.timestamp >= receivedTokenObject.timestamp
+        } else {
+            return nil
+        }
+    }
 }
 
 extension ActivePeripheral: Equatable {

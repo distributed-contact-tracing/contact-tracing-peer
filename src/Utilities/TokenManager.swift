@@ -7,9 +7,13 @@
 
 import Foundation
 
+struct Token {
+    let timestamp: TimeInterval
+    let uuid: String
+}
 
 struct TokenManager {
-    func createToken() -> String {
+    func createStringToken() -> String {
         let date = Date().timeIntervalSince1970
         let randID = UUID().uuidString
         
@@ -17,7 +21,15 @@ struct TokenManager {
         return token
     }
     
-    /*func shouldUseDeviceToken(deviceToken: String, remoteToken: String) -> Bool {
+    func tokenFrom(string: String) -> Token? {
+        let tokenComponents = string.components(separatedBy: "_")
         
-    }*/
+        if tokenComponents.count == 2 {
+            guard let timestamp = TimeInterval(tokenComponents[0]) else { return nil }
+            let uuid = tokenComponents[1]
+            return Token(timestamp: timestamp, uuid: uuid)
+        } else {
+            return nil
+        }
+    }
 }
