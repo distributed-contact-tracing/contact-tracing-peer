@@ -7,19 +7,21 @@
 
 import Foundation
 import CoreBluetooth
+import Combine
 
 final class BluetoothManager: NSObject, ObservableObject {
     private var centralManager: CBCentralManager?
     private var peripheralManager = CBPeripheralManager()
     private var uuid = CBUUID(string: "29927D08-7D4B-4CAC-B10A-8BBF882395D1")
     
-    private var activePeripherals: [CBPeripheral] = []
+    let objectWillChange = PassthroughSubject<Void, Never>()
+    @Published var activePeripherals: [ActivePeripheral] = [] {
+        willSet { objectWillChange.send() }
+    }
     
     let WR_UUID = CBUUID(string: "0437D2AC-A560-413E-BE04-A75E4FA5BBAE")
     let WR_PROPERTIES: CBCharacteristicProperties = .write
     let WR_PERMISSIONS: CBAttributePermissions = .writeable
-    
-    @Published var peripheral: String = ""
     
     override init() {
         super.init()
@@ -77,7 +79,36 @@ extension BluetoothManager: CBCentralManagerDelegate {
             print("NAME:", advertisementName)
         }
         
-        activePeripherals.append(peripheral)
+        let activePeripheral = ActivePeripheral(signalStrength: RSSI, peripheral: peripheral, foundTimestamp: Date(), lastSeenTimestamp: Date())
+        
+        if !activePeripherals.contains(activePeripheral) {
+            print("New object found")
+            activePeripherals.append(activePeripheral)
+            print("Added to list")
+        } else {
+            // Update proximity
+            print("Update proximity")
+            /*activePeripherals = activePeripherals.map { peripheralItem in
+                if peripheralItem.peripheral == peripheral {
+                    var updatedPeripheral = activePeripheral
+                    updatedPeripheral.lastSeenTimestamp = Date()
+                    updatedPeripheral.signalStrength = RSSI
+                    return updatedPeripheral
+                } else {
+                    return peripheralItem
+                }
+            }*/
+            
+            //activePeripherals[0].lastSeenTimestamp = Date()
+            //activePeripherals[0].signalStrength = RSSI
+            activePeripherals.first(where: { $0.peripheral == peripheral })?.signalStrength = RSSI
+            activePeripherals.first(where: { $0.peripheral == peripheral })?.lastSeenTimestamp = Date()
+            for item in activePeripherals {
+                print("PERS:", item.signalStrength)
+                print("PERS:", item.lastSeenTimestamp)
+            }
+            //activePeripherals.first { $0.peripheral == peripheral }?.signalStrength = RSSI
+        }
         connectOnce()
         //print("DATA:", advertisementData)
     }
@@ -87,7 +118,7 @@ extension BluetoothManager: CBCentralManagerDelegate {
 
         if !Holder.called {
             Holder.called = true
-            centralManager?.connect(activePeripherals[0], options: nil)
+            //centralManager?.connect(activePeripherals[0], options: nil)
         }
     }
     

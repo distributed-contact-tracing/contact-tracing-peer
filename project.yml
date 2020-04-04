@@ -4,7 +4,7 @@ options:
 settings:
   DEVELOPMENT_TEAM: VDQM747B3N
 targets:
-  DistContactTracing:
+  MySharedAir:
     type: application
     platform: iOS
     deploymentTarget: "13.0"
