@@ -9,6 +9,9 @@
 import SwiftUI
 
 struct MainView: View {
+    //@ObservedObject var p2pManager = P2PManager()
+    @ObservedObject var btManager = BluetoothManager()
+    
     var body: some View {
         ZStack { Color(Asset.offWhite.color).edgesIgnoringSafeArea(.all)
             VStack {
@@ -20,7 +23,7 @@ struct MainView: View {
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 10)
                 Image(uiImage: Asset.backgroundPeople.image)
-                    .padding(.vertical, 20.0)
+                    .padding(.vertical, 12.0)
                 Spacer()
                 ZStack {
                     VStack {
@@ -42,7 +45,7 @@ struct MainView: View {
                 Button(action: {
                     print("Start tracking")
                 }) {
-                    Text("Start tracing")
+                    Text("\(btManager.peripheral)")
                         .fontWeight(.medium)
                         .font(.system(size: 20))
                         .padding(.vertical, 15)
@@ -50,7 +53,7 @@ struct MainView: View {
                         .background(Color(Asset.actionBlue.color))
                         .cornerRadius(10)
                         .foregroundColor(.white)
-                }.frame(maxWidth: .infinity).padding(.top, 20).padding(.horizontal, 15)
+                    }.frame(maxWidth: .infinity).padding(.vertical, 20).padding(.horizontal, 15)
             }
         }
     }
