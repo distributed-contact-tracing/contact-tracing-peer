@@ -8,9 +8,12 @@
 
 import UIKit
 import Firebase
+import Combine
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate, MessagingDelegate {
+    
+    
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         FirebaseApp.configure()
@@ -28,7 +31,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         InfectionManager.shared.downloadInfectedInteractions { result, error in
             if let result = result {
                 let hasResult = InfectionManager.shared.findMatch(from: result)
-                if !hasResult && application.applicationState == .background {
+                if hasResult && application.applicationState == .background {
                     self.showMatchNotification()
                 }
                 completionHandler(.newData)

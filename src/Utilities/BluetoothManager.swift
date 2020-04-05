@@ -10,7 +10,7 @@ import CoreBluetooth
 import Combine
 
 final class BluetoothManager: NSObject, ObservableObject {
-    private var centralManager: CBCentralManager?
+    private var centralManager: CBCentralManager!
     private var peripheralManager = CBPeripheralManager()
     private var uuid = CBUUID(string: "29927D08-7D4B-4CAC-B10A-8BBF882395D1")
     
@@ -22,8 +22,17 @@ final class BluetoothManager: NSObject, ObservableObject {
     
     override init() {
         super.init()
+    }
+    
+    func startTracing() {
         centralManager = CBCentralManager(delegate: self, queue: DispatchQueue.main)
         peripheralManager = CBPeripheralManager(delegate: self, queue: nil)
+    }
+    
+    func stopTracing() {
+        centralManager?.stopScan()
+        peripheralManager.stopAdvertising()
+        activePeripherals = []
     }
 }
 

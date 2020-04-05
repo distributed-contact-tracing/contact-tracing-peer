@@ -9,8 +9,8 @@
 import SwiftUI
 
 struct MainView: View {
-    @State private var showModal = false
-    @State private var falseFalse = false
+    let btManager = BluetoothManager()
+    @State var isTracing = false
     
     var body: some View {
         ZStack { Color(Asset.offWhite.color).edgesIgnoringSafeArea(.all)
@@ -42,19 +42,22 @@ struct MainView: View {
                 
                 Button(action: {
                     print("Start tracing")
-                    self.showModal = true
+                    self.isTracing = !self.isTracing
+                    if self.isTracing {
+                        self.btManager.stopTracing()
+                    } else {
+                        self.btManager.startTracing()
+                    }
                 }) {
-                    Text(showModal ? "Tracing" : "Start tracing")
+                    Text(isTracing ? "Stop tracing" : "Start tracing")
                         .fontWeight(.medium)
                         .font(.system(size: 20))
                         .padding(.vertical, 15)
                         .frame(maxWidth: .infinity)
-                        .background(showModal ? Color(UIColor.green) : Color(Asset.actionBlue.color))
+                        .background(isTracing ? Color(UIColor.green) : Color(Asset.actionBlue.color))
                         .cornerRadius(10)
                         .foregroundColor(.white)
                     }.frame(maxWidth: .infinity).padding(.vertical, 20).padding(.horizontal, 15)
-            }.sheet(isPresented: self.$showModal) {
-                BTDebugView()
             }
         }
     }
