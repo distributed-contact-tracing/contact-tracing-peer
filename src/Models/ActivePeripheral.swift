@@ -59,7 +59,7 @@ class ActivePeripheral: Identifiable, ObservableObject {
             guard let sentTokenObject = TokenManager().tokenFrom(string: sentToken) else { return nil }
             guard let receivedTokenObject = TokenManager().tokenFrom(string: receivedToken) else { return nil }
             
-            return sentTokenObject.timestamp < receivedTokenObject.timestamp
+            return sentTokenObject.timestamp >= receivedTokenObject.timestamp
         } else {
             return nil
         }
