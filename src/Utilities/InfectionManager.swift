@@ -9,17 +9,32 @@ import Foundation
 import Firebase
 
 class InfectionManager {
-    var db: Firestore
+    static let shared = InfectionManager()
+    private init() {}
     
-    init() {
-        db = Firestore.firestore()
+    lazy var db: Firestore = {
+        return Firestore.firestore()
+    }()
+    
+    func downloadInfectedInteractions(completionHandler: @escaping (_ result: [String]?, _ error: Error?) -> Void) {
+        let interactionsRef = db.collection("contactEvents")
+        let lastFetch = LastUpdated().lastUpdatedDate ?? Date(timeIntervalSince1970: 0)
+        
+        interactionsRef.whereField("added", isGreaterThan: lastFetch).getDocuments() { querySnapshot, err in
+            if let err = err {
+                print("Error getting documents: \(err)")
+                completionHandler(nil, err)
+            } else {
+                if let querySnapshot = querySnapshot {
+                    let interactionList = querySnapshot.documents.compactMap { $0.data()["token"] as? String }
+                    LastUpdated().lastUpdatedDate = Date()
+                    completionHandler(interactionList, nil)
+                }
+            }
+        }
     }
     
-    /*func downloadInfectedInteractions() {
-        let
-    }*/
-    
-    func uploadInfectedInteractions() {
+    func uploadInfectedInteractions(completionHandler: @escaping (_ error: Error?) -> Void) {
         let batch = db.batch()
         
         do {
@@ -37,15 +52,28 @@ class InfectionManager {
             batch.commit() { err in
                 if let err = err {
                     print("Error writing batch \(err.localizedDescription)")
+                    completionHandler(err)
                 } else {
                     print("Batch write succeeded.")
-                    LastUpdated().lastUpdatedDate = Date()
+                    completionHandler(nil)
                 }
             }
         } catch let e {
             print(e.localizedDescription)
+            completionHandler(e)
         }
     }
     
-    //func hasMatch
+    func findMatch(from array: [String]) -> Bool {
+        do {
+            let savedItems = try StorageManager.shared.fetchInteractions()
+            let keys = savedItems.compactMap { $0.id }
+            
+            let commonKeys = keys.filter(array.contains)
+            return commonKeys.count != 0
+        } catch let e {
+            print("Error getting data:", e.localizedDescription)
+            return false
+        }
+    }
 }

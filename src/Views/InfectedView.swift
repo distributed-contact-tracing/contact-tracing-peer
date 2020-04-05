@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct InfectedView: View {
-    let infectionManager = InfectionManager()
+    @State var isLoading = false
     
     var body: some View {
         ZStack { Color(Asset.offWhite.color).edgesIgnoringSafeArea(.all)
@@ -30,9 +30,12 @@ struct InfectedView: View {
                 
                 Button(action: {
                     print("Share data")
-                    self.infectionManager.uploadInfectedInteractions()
+                    self.isLoading = true
+                    InfectionManager.shared.uploadInfectedInteractions { error in
+                        self.isLoading = false
+                    }
                 }) {
-                    Text("Share my data")
+                    Text(isLoading ? "Sharing..." : "Share my data")
                         .fontWeight(.medium)
                         .font(.system(size: 20))
                         .padding(.vertical, 15)
@@ -40,7 +43,7 @@ struct InfectedView: View {
                         .background(Color(Asset.actionBlue.color))
                         .cornerRadius(10)
                         .foregroundColor(.white)
-                    }.frame(maxWidth: .infinity).padding(.vertical, 20).padding(.horizontal, 15)
+                    }.disabled(isLoading).frame(maxWidth: .infinity).padding(.vertical, 20).padding(.horizontal, 15)
             }
         }
     }

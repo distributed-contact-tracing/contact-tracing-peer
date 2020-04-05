@@ -23,6 +23,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         
         application.registerForRemoteNotifications()
         
+        InfectionManager.shared.downloadInfectedInteractions { result, error in
+            if let result = result {
+                for item in result {
+                    print(item)
+                }
+            }
+        }
+        
         return true
     }
     
