@@ -8,7 +8,6 @@
 
 import UIKit
 import Firebase
-import BackgroundTasks
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate, MessagingDelegate {
@@ -19,40 +18,54 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         handleSignIn()
         
         setupNotifications()
-        registerBackgroundTasks()
-        
         application.registerForRemoteNotifications()
-        
-        InfectionManager.shared.downloadInfectedInteractions { result, error in
-            if let result = result {
-                for item in result {
-                    print(item)
-                }
-            }
-        }
+        application.setMinimumBackgroundFetchInterval(1800)
         
         return true
     }
     
-    func registerBackgroundTasks() {
-        BGTaskScheduler.shared.register(forTaskWithIdentifier: "", using: nil) { task in
-            
+    func application(_ application: UIApplication, performFetchWithCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+        InfectionManager.shared.downloadInfectedInteractions { result, error in
+            if let result = result {
+                let hasResult = InfectionManager.shared.findMatch(from: result)
+                if !hasResult && application.applicationState == .background {
+                    self.showMatchNotification()
+                }
+                completionHandler(.newData)
+            } else {
+                completionHandler(.failed)
+            }
         }
+    }
+    
+    func showMatchNotification() {
+        let content = UNMutableNotificationContent()
+        content.title = "Alert"
+        content.body = "You have been near a person tested positive for COVID-19. Open the app to see next steps."
+
+        let request = UNNotificationRequest(
+            identifier: UUID().uuidString,
+            content: content,
+            trigger: UNTimeIntervalNotificationTrigger(timeInterval: 5, repeats: false)
+        )
+        
+        UNUserNotificationCenter.current().add(request)
     }
     
     func handleSignIn() {
         if Authentication().userID == nil {
             Auth.auth().signInAnonymously() { (authResult, error) in
                 guard let user = authResult?.user else { return }
-                print("signed in with uid", user.uid)
                 Authentication().userID = user.uid
             }
         }
     }
     
+    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+        print("REPSONSED")
+    }
+    
     func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String) {
-        print("Firebase registration token: \(fcmToken)")
-
         let dataDict:[String: String] = ["token": fcmToken]
         NotificationCenter.default.post(name: Notification.Name("FCMToken"), object: nil, userInfo: dataDict)
         

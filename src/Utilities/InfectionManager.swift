@@ -68,9 +68,11 @@ class InfectionManager {
         do {
             let savedItems = try StorageManager.shared.fetchInteractions()
             let keys = savedItems.compactMap { $0.id }
+            let keysSet = Set(keys)
+            let compareSet = Set(array)
             
-            let commonKeys = keys.filter(array.contains)
-            return commonKeys.count != 0
+            let intersect = Array(keysSet.intersection(compareSet))
+            return intersect.count != 0
         } catch let e {
             print("Error getting data:", e.localizedDescription)
             return false
