@@ -12,8 +12,6 @@ import Combine
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate, MessagingDelegate {
-    
-    
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         FirebaseApp.configure()
@@ -45,7 +43,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         let content = UNMutableNotificationContent()
         content.title = "Alert"
         content.body = "You have been near a person tested positive for COVID-19. Open the app to see next steps."
-
+        content.categoryIdentifier = "NearPositivePerson"
+        
         let request = UNNotificationRequest(
             identifier: UUID().uuidString,
             content: content,
@@ -65,7 +64,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     }
     
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
-        print("REPSONSED")
+        let catIdentifier = response.notification.request.content.categoryIdentifier
+        
+        if catIdentifier == "NearPositivePerson" {
+            InfectedEvents().shouldBeWarned = true
+        }
     }
     
     func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String) {

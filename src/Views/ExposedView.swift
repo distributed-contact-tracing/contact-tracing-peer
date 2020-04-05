@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct ExposedView: View {
+    @Environment(\.presentationMode) var presentationMode
+    
     let fhmURL = "https://www.folkhalsomyndigheten.se/smittskydd-beredskap/utbrott/aktuella-utbrott/covid-19/skydda-dig-och-andra/information-pa-olika-sprak/engelska/"
     
     var body: some View {
@@ -45,6 +47,7 @@ struct ExposedView: View {
                 
                 Button(action: {
                     print("Dismiss")
+                    self.presentationMode.wrappedValue.dismiss()
                 }) {
                     Text("OK")
                         .fontWeight(.medium)

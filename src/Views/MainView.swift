@@ -10,6 +10,8 @@ import SwiftUI
 
 struct MainView: View {
     let btManager = BluetoothManager()
+    
+    @EnvironmentObject var appState: AppState
     @State var isTracing = false
     
     var body: some View {
@@ -59,6 +61,8 @@ struct MainView: View {
                         .foregroundColor(.white)
                     }.frame(maxWidth: .infinity).padding(.vertical, 20).padding(.horizontal, 15)
             }
+        }.sheet(isPresented: $appState.showExposedView) {
+            ExposedView()
         }
     }
 }
