@@ -35,4 +35,20 @@ class InfectedEvents {
             UserDefaults.standard.set(newValue, forKey: #function)
         }
     }
+    
+    var isInfected: Bool? {
+        get {
+            return UserDefaults.standard.bool(forKey: #function)
+        } set {
+            UserDefaults.standard.set(newValue, forKey: #function)
+        }
+    }
+    
+    var hasUploadedData: Bool? {
+        get {
+            return UserDefaults.standard.bool(forKey: #function)
+        } set {
+            UserDefaults.standard.set(newValue, forKey: #function)
+        }
+    }
 }

@@ -9,6 +9,10 @@ import SwiftUI
 
 struct InfectedView: View {
     @State var isLoading = false
+    @State var hasShared = InfectedEvents().hasUploadedData ?? false
+    
+    let notSharedParagraph = "Your COVID-19 test showed that you are infected with the SARS-CoV-2 virus. To anonymously notify the people you have been around and possibly infected, press the button."
+    let sharedParagraph = "Thank you for sharing your data. You are a hero, potentially saving lives!"
     
     var body: some View {
         ZStack { Color(Asset.offWhite.color).edgesIgnoringSafeArea(.all)
@@ -25,7 +29,7 @@ struct InfectedView: View {
                 InfoBox(
                     title: "What to do now",
                     icon: "questionmark.circle",
-                    paragraph: "Your COVID-19 test showed that you are infected with the SARS-CoV-2 virus. To anonymously notify the people you have been around and possibly infected, press the button."
+                    paragraph: hasShared ? sharedParagraph : notSharedParagraph
                 ).padding(.horizontal, 15)
                 
                 Button(action: {
@@ -33,17 +37,21 @@ struct InfectedView: View {
                     self.isLoading = true
                     InfectionManager.shared.uploadInfectedInteractions { error in
                         self.isLoading = false
+                        if error == nil {
+                            self.hasShared = true
+                            InfectedEvents().hasUploadedData = true
+                        }
                     }
                 }) {
-                    Text(isLoading ? "Sharing..." : "Share my data")
+                    Text(isLoading ? "Sharing..." : hasShared ? "Data shared" : "Share my data")
                         .fontWeight(.medium)
                         .font(.system(size: 20))
                         .padding(.vertical, 15)
                         .frame(maxWidth: .infinity)
-                        .background(Color(Asset.actionBlue.color))
+                        .background(hasShared ? Color.gray : Color(Asset.actionBlue.color))
                         .cornerRadius(10)
                         .foregroundColor(.white)
-                    }.disabled(isLoading).frame(maxWidth: .infinity).padding(.vertical, 20).padding(.horizontal, 15)
+                    }.disabled(isLoading || hasShared).frame(maxWidth: .infinity).padding(.vertical, 20).padding(.horizontal, 15)
             }
         }
     }

@@ -23,15 +23,18 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // If using a storyboard, the `window` property will automatically be initialized and attached to the scene.
         // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
 
-        // Create the SwiftUI view that provides the window contents.
-        let contentView = MainView().environmentObject(appState)
-        
-        // Use a UIHostingController as window root view controller.
-        if let windowScene = scene as? UIWindowScene {
-            let window = UIWindow(windowScene: windowScene)
-            window.rootViewController = UIHostingController(rootView: contentView)
-            self.window = window
-            window.makeKeyAndVisible()
+        if InfectedEvents().isInfected == true {
+            configureInfectedView(scene)
+        } else {
+            let contentView = MainView().environmentObject(appState)
+            
+            // Use a UIHostingController as window root view controller.
+            if let windowScene = scene as? UIWindowScene {
+                let window = UIWindow(windowScene: windowScene)
+                window.rootViewController = UIHostingController(rootView: contentView)
+                self.window = window
+                window.makeKeyAndVisible()
+            }
         }
     }
 
@@ -53,13 +56,27 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
 
     func sceneWillEnterForeground(_ scene: UIScene) {
-        // Called as the scene transitions from the background to the foreground.
-        // Use this method to undo the changes made on entering the background.
-        
         if let shouldBeWarned = InfectedEvents().shouldBeWarned {
             if shouldBeWarned {
                 appState.showExposedView = true
                 InfectedEvents().shouldBeWarned = false
+            }
+        }
+        
+        InfectionManager.shared.downloadInfectedInteractions { result, error in
+            if let result = result {
+                let hasResult = InfectionManager.shared.findMatch(from: result)
+                if hasResult {
+                    self.appState.showExposedView = true
+                }
+            } else {
+                print("Error downloading infection data")
+            }
+        }
+        
+        if let infected = InfectedEvents().isInfected {
+            if infected {
+                configureInfectedView(scene)
             }
         }
     }
@@ -70,6 +87,18 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // to restore the scene back to its current state.
     }
 
-
+    func configureInfectedView(_ scene: UIScene) {
+        // Create the SwiftUI view that provides the window contents.
+        let infectedView = InfectedView()
+        
+        // Use a UIHostingController as window root view controller.
+        if let windowScene = scene as? UIWindowScene {
+            let window = UIWindow(windowScene: windowScene)
+            window.rootViewController = UIHostingController(rootView: infectedView)
+            self.window = window
+            window.makeKeyAndVisible()
+        }
+    }
+    
 }
 

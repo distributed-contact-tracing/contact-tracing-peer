@@ -78,4 +78,17 @@ class InfectionManager {
             return false
         }
     }
+    
+    func uploadDeviceNotificationToken(_ token: String, for uid: String, completionHandler: @escaping (_ error: Error?) -> Void) {
+        let documentRef = db.collection("deviceRegistrationTokens").document(uid)
+        documentRef.setData(["fcmToken": token]) { err in
+            if let err = err {
+                print("Error writing token \(err.localizedDescription)")
+                completionHandler(err)
+            } else {
+                print("Token write succeeded.")
+                completionHandler(nil)
+            }
+        }
+    }
 }

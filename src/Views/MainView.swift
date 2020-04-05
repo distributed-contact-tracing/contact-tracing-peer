@@ -18,7 +18,7 @@ struct MainView: View {
         ZStack { Color(Asset.offWhite.color).edgesIgnoringSafeArea(.all)
             VStack {
                 Spacer()
-                Text("Safe Contact Tracing")
+                Text("My Shared Air")
                     .font(.system(size: 40))
                     .foregroundColor(Color(Asset.niceRed.color))
                     .fontWeight(.bold)

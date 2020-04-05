@@ -16,7 +16,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         // Override point for customization after application launch.
         FirebaseApp.configure()
         Messaging.messaging().delegate = self
-        handleSignIn()
         
         setupNotifications()
         application.registerForRemoteNotifications()
@@ -31,6 +30,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
                 let hasResult = InfectionManager.shared.findMatch(from: result)
                 if hasResult && application.applicationState == .background {
                     self.showMatchNotification()
+                    InfectedEvents().shouldBeWarned = true
                 }
                 completionHandler(.newData)
             } else {
@@ -54,11 +54,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         UNUserNotificationCenter.current().add(request)
     }
     
-    func handleSignIn() {
+    func handleSignIn(with token: String) {
         if Authentication().userID == nil {
             Auth.auth().signInAnonymously() { (authResult, error) in
                 guard let user = authResult?.user else { return }
                 Authentication().userID = user.uid
+                
+                InfectionManager.shared.uploadDeviceNotificationToken(token, for: user.uid) { err in
+                    if let err = err {
+                        print(err.localizedDescription)
+                    }
+                }
             }
         }
     }
@@ -68,7 +74,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         
         if catIdentifier == "NearPositivePerson" {
             InfectedEvents().shouldBeWarned = true
+        } else {
+            InfectedEvents().isInfected = true
         }
+        
+        completionHandler()
     }
     
     func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String) {
@@ -78,6 +88,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         Messaging.messaging().subscribe(toTopic: "region") { error in
           print("Subscribed to region topic")
         }
+        
+        if let uid = Authentication().userID {
+            InfectionManager.shared.uploadDeviceNotificationToken(fcmToken, for: uid) { err in
+                if let err = err {
+                    print(err.localizedDescription)
+                }
+            }
+        }
+        
+        handleSignIn(with: fcmToken)
+        
         // TODO: If necessary send token to application server.
         // Note: This callback is fired at each app startup and whenever a new token is generated.
     }
