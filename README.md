@@ -2,6 +2,8 @@
 
 A peer node application for distributed contact tracing. Running on iOS.
 
+The state of the repo after the hackathon can be found in the branch *hackathon*
+
 # Setup
 
 1. Install XcodeGen: `brew install xcodegen`
