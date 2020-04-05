@@ -14,8 +14,6 @@ final class BluetoothManager: NSObject, ObservableObject {
     private var peripheralManager = CBPeripheralManager()
     private var uuid = CBUUID(string: "29927D08-7D4B-4CAC-B10A-8BBF882395D1")
     
-    let storageManager = StorageManager()
-    
     @Published var activePeripherals: [ActivePeripheral] = []
     
     let WR_UUID = CBUUID(string: "0437D2AC-A560-413E-BE04-A75E4FA5BBAE")
@@ -26,7 +24,6 @@ final class BluetoothManager: NSObject, ObservableObject {
         super.init()
         centralManager = CBCentralManager(delegate: self, queue: DispatchQueue.main)
         peripheralManager = CBPeripheralManager(delegate: self, queue: nil)
-        storageManager.initializeStack()
     }
 }
 
@@ -69,8 +66,7 @@ extension BluetoothManager: CBCentralManagerDelegate {
         let activePeripheral = ActivePeripheral(
             signalStrength: RSSI,
             peripheral: peripheral,
-            initialTimestamp: Date(),
-            storageManager: storageManager
+            initialTimestamp: Date()
         )
         
         if !activePeripherals.contains(activePeripheral) {

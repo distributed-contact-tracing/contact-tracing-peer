@@ -6,6 +6,8 @@ target 'MySharedAir' do
   use_frameworks!
   pod 'Firebase/Analytics'
   pod 'Firebase/Messaging'
+  pod 'Firebase/Firestore'
+  pod 'FirebaseFirestoreSwift'
   pod 'Firebase/Auth'
 
   # Pods for MySharedAir

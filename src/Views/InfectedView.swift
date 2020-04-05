@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct InfectedView: View {
+    let infectionManager = InfectionManager()
+    
     var body: some View {
         ZStack { Color(Asset.offWhite.color).edgesIgnoringSafeArea(.all)
             VStack {
@@ -28,6 +30,7 @@ struct InfectedView: View {
                 
                 Button(action: {
                     print("Share data")
+                    self.infectionManager.uploadInfectedInteractions()
                 }) {
                     Text("Share my data")
                         .fontWeight(.medium)

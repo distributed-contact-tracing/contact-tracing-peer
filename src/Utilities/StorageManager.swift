@@ -9,18 +9,22 @@ import Foundation
 import CoreData
 
 class StorageManager {
-    let persistentContainer = NSPersistentContainer(name: "InteractionDataModel")
-    var context: NSManagedObjectContext {
-        return self.persistentContainer.viewContext
-    }
+    static let shared = StorageManager()
+    private init() {}
     
-    func initializeStack() {
-        self.persistentContainer.loadPersistentStores { description, error in
+    lazy var persistentContainer: NSPersistentContainer = {
+        let container = NSPersistentContainer(name: "InteractionDataModel")
+        container.loadPersistentStores { description, error in
             if let error = error {
                 print("Error leading store:", error.localizedDescription)
                 return
             }
         }
+        return container
+    }()
+    
+    var context: NSManagedObjectContext {
+        return StorageManager.shared.persistentContainer.viewContext
     }
     
     func insertInteraction(id: String, severity: Float) throws -> Interaction {

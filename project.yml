@@ -16,6 +16,7 @@ targets:
         com.apple.Push:
           enabled: 1
     settings:
+      CODE_SIGN_ENTITLEMENTS: src/MySharedAir.entitlements
       configs:
         debug:
         release:

@@ -11,7 +11,6 @@ import Combine
 
 class ActivePeripheral: Identifiable, ObservableObject {
     let objectWillChange = ObservableObjectPublisher()
-    let storageManager: StorageManager
     
     let peripheral: CBPeripheral
     let id: String
@@ -42,12 +41,11 @@ class ActivePeripheral: Identifiable, ObservableObject {
         }
     }
     
-    init(signalStrength: NSNumber, peripheral: CBPeripheral, initialTimestamp: Date, storageManager: StorageManager) {
+    init(signalStrength: NSNumber, peripheral: CBPeripheral, initialTimestamp: Date) {
         self.peripheral = peripheral
         self.timestamps = [initialTimestamp]
         self.signalStrengths = [signalStrength]
         self.id = peripheral.identifier.uuidString
-        self.storageManager = storageManager
     }
     
     func shouldUseSentToken() -> Bool? {
@@ -76,7 +74,7 @@ class ActivePeripheral: Identifiable, ObservableObject {
                     let tokenToUse = useSentToken ? sentHandshakeToken : receivedHandshakeToken
                     guard let hash = tokenToUse?.sha256() else { return }
                     print("HASH:", hash)
-                    let storedInteraction = try storageManager.insertInteraction(id: hash, severity: severity())
+                    let storedInteraction = try StorageManager.shared.insertInteraction(id: hash, severity: severity())
                     interaction = storedInteraction
                 }
             } catch (let e) {
@@ -88,7 +86,7 @@ class ActivePeripheral: Identifiable, ObservableObject {
     private func updateCoreData() {
         if let storedInteraction = interaction {
             do {
-                try storageManager.update(storedInteraction, with: severity())
+                try StorageManager.shared.update(storedInteraction, with: severity())
             } catch let e {
                 print(e.localizedDescription)
             }
