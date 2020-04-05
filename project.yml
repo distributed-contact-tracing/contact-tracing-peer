@@ -4,12 +4,17 @@ options:
 settings:
   DEVELOPMENT_TEAM: VDQM747B3N
   SWIFT_OBJC_BRIDGING_HEADER: src/MySharedAir-Bridging-Header.h
+  CODE_SIGN_ENTITLEMENTS: src/MySharedAir.entitlements
 targets:
   MySharedAir:
     type: application
     platform: iOS
     deploymentTarget: "13.0"
     sources: [src]
+    attributes:
+      SystemCapabilities:
+        com.apple.Push:
+          enabled: 1
     settings:
       configs:
         debug:

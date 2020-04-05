@@ -75,7 +75,7 @@ class ActivePeripheral: Identifiable, ObservableObject {
                 if let useSentToken = shouldUseSentToken() {
                     let tokenToUse = useSentToken ? sentHandshakeToken : receivedHandshakeToken
                     guard let hash = tokenToUse?.sha256() else { return }
-                    
+                    print("HASH:", hash)
                     let storedInteraction = try storageManager.insertInteraction(id: hash, severity: severity())
                     interaction = storedInteraction
                 }

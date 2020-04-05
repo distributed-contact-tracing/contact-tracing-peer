@@ -43,6 +43,8 @@
 	<string>LaunchScreen</string>
 	<key>UIBackgroundModes</key>
 	<array>
+		<string>processing</string>
+		<string>remote-notification</string>
 		<string>bluetooth-central</string>
 		<string>bluetooth-peripheral</string>
 	</array>

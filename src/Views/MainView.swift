@@ -22,25 +22,23 @@ struct MainView: View {
                     .fontWeight(.bold)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 10)
-                Image(uiImage: Asset.backgroundPeople.image)
-                    .padding(.vertical, 12.0)
+                GeometryReader { geo in
+                    Image(uiImage: Asset.backgroundPeople.image)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: geo.size.width)
+                        .clipped()
+                        .padding(.vertical, 12.0)
+                }
                 Spacer()
-                ZStack {
-                    VStack {
-                        HStack {
-                            Image(systemName: "info.circle").font(.system(size: 30.0))
-                            Text("How it works")
-                                .font(.system(size: 20))
-                                .fontWeight(.semibold)
-                                .padding(.leading, 7)
-                            Spacer()
-                        }.padding(.bottom, 10).padding(.horizontal, 20).padding(.top, 20)
-                        Text("By matching interactions from people marked as sick in COVID-19 with interactions stored locally on your device, you'll get notified if you have been in their proximity and thus if you should get tested.")
-                            .foregroundColor(Color(Asset.offBlack.color))
-                            .padding(.horizontal, 20)
-                            .padding(.bottom, 20)
-                    }.background(Color.white).cornerRadius(10).shadow(color: Color(red: 0, green: 0, blue: 0, opacity: 0.1), radius: 10, y: 5)
-                }.padding(.horizontal, 15)
+                
+                InfoBox(
+                    title: "How it works",
+                    icon: "info.circle",
+                    paragraph: "By matching interactions from people marked as sick in COVID-19 with interactions stored locally on your device, you'll get notified if you have been in their proximity and thus if you should get tested."
+                )
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(.horizontal, 15)
                 
                 Button(action: {
                     print("Start tracing")
