@@ -10,20 +10,44 @@ import CoreBluetooth
 import Combine
 
 class ActivePeripheral: Identifiable, ObservableObject {
-    @Published var signalStrength: NSNumber?
-    let peripheral: CBPeripheral
-    let foundTimestamp: Date
-    @Published var sentHandshakeToken: String?
-    @Published var receivedHandshakeToken: String?
-    @Published var lastSeenTimestamp: Date
-    let id: String
+    let objectWillChange = ObservableObjectPublisher()
+    let storageManager: StorageManager
     
-    init(signalStrength: NSNumber, peripheral: CBPeripheral, foundTimestamp: Date, lastSeenTimestamp: Date) {
-        self.signalStrength = signalStrength
+    let peripheral: CBPeripheral
+    let id: String
+    var interaction: Interaction?
+    
+    var sentHandshakeToken: String? {
+        didSet {
+            objectWillChange.send()
+            addToCoreData()
+        }
+    }
+    var receivedHandshakeToken: String? {
+        didSet {
+            objectWillChange.send()
+            addToCoreData()
+        }
+    }
+    var signalStrengths: [NSNumber] {
+        didSet {
+            objectWillChange.send()
+            updateCoreData()
+        }
+    }
+    var timestamps: [Date] {
+        didSet {
+            objectWillChange.send()
+            updateCoreData()
+        }
+    }
+    
+    init(signalStrength: NSNumber, peripheral: CBPeripheral, initialTimestamp: Date, storageManager: StorageManager) {
         self.peripheral = peripheral
-        self.foundTimestamp = foundTimestamp
-        self.lastSeenTimestamp = lastSeenTimestamp
+        self.timestamps = [initialTimestamp]
+        self.signalStrengths = [signalStrength]
         self.id = peripheral.identifier.uuidString
+        self.storageManager = storageManager
     }
     
     func shouldUseSentToken() -> Bool? {
@@ -35,9 +59,39 @@ class ActivePeripheral: Identifiable, ObservableObject {
             guard let sentTokenObject = TokenManager().tokenFrom(string: sentToken) else { return nil }
             guard let receivedTokenObject = TokenManager().tokenFrom(string: receivedToken) else { return nil }
             
-            return sentTokenObject.timestamp >= receivedTokenObject.timestamp
+            return sentTokenObject.timestamp < receivedTokenObject.timestamp
         } else {
             return nil
+        }
+    }
+    
+    func severity() -> Float {
+        return 0
+    }
+    
+    private func addToCoreData() {
+        if (sentHandshakeToken != nil || receivedHandshakeToken != nil) && interaction == nil {
+            do {
+                if let useSentToken = shouldUseSentToken() {
+                    let tokenToUse = useSentToken ? sentHandshakeToken : receivedHandshakeToken
+                    guard let hash = tokenToUse?.sha256() else { return }
+                    
+                    let storedInteraction = try storageManager.insertInteraction(id: hash, severity: severity())
+                    interaction = storedInteraction
+                }
+            } catch (let e) {
+                print(e.localizedDescription)
+            }
+        }
+    }
+    
+    private func updateCoreData() {
+        if let storedInteraction = interaction {
+            do {
+                try storageManager.update(storedInteraction, with: severity())
+            } catch let e {
+                print(e.localizedDescription)
+            }
         }
     }
 }

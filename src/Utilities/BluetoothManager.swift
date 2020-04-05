@@ -14,6 +14,8 @@ final class BluetoothManager: NSObject, ObservableObject {
     private var peripheralManager = CBPeripheralManager()
     private var uuid = CBUUID(string: "29927D08-7D4B-4CAC-B10A-8BBF882395D1")
     
+    let storageManager = StorageManager()
+    
     @Published var activePeripherals: [ActivePeripheral] = []
     
     let WR_UUID = CBUUID(string: "0437D2AC-A560-413E-BE04-A75E4FA5BBAE")
@@ -24,6 +26,7 @@ final class BluetoothManager: NSObject, ObservableObject {
         super.init()
         centralManager = CBCentralManager(delegate: self, queue: DispatchQueue.main)
         peripheralManager = CBPeripheralManager(delegate: self, queue: nil)
+        storageManager.initializeStack()
     }
 }
 
@@ -63,7 +66,12 @@ extension BluetoothManager: CBCentralManagerDelegate {
     
     func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
         
-        let activePeripheral = ActivePeripheral(signalStrength: RSSI, peripheral: peripheral, foundTimestamp: Date(), lastSeenTimestamp: Date())
+        let activePeripheral = ActivePeripheral(
+            signalStrength: RSSI,
+            peripheral: peripheral,
+            initialTimestamp: Date(),
+            storageManager: storageManager
+        )
         
         if !activePeripherals.contains(activePeripheral) {
             // New object found
@@ -73,8 +81,8 @@ extension BluetoothManager: CBCentralManagerDelegate {
             }
         } else {
             // Update proximity
-            activePeripherals.first(where: { $0.peripheral == peripheral })?.signalStrength = RSSI
-            activePeripherals.first(where: { $0.peripheral == peripheral })?.lastSeenTimestamp = Date()
+            activePeripherals.first(where: { $0.peripheral == peripheral })?.signalStrengths.append(RSSI)
+            activePeripherals.first(where: { $0.peripheral == peripheral })?.timestamps.append(Date())
         }
     }
     

@@ -23,9 +23,18 @@ struct PeripheralRow: View {
     var body: some View {
         VStack(alignment: .leading) {
             Text("\(peripheral.peripheral.identifier)").fontWeight(.semibold)
-            Text("Found \(peripheral.foundTimestamp)")
-            Text("Last seen \(peripheral.lastSeenTimestamp)")
-            Text("Signal strength \(peripheral.signalStrength ?? 0)")
+            HStack {
+                Text("Signal strength")
+                ForEach(peripheral.signalStrengths, id: \.self) { strength in
+                    Text("\(strength)")
+                }
+            }
+            HStack {
+                Text("Timestamps")
+                ForEach(peripheral.timestamps, id: \.self) { timestamp in
+                    Text("\(timestamp)")
+                }
+            }
             Text("Received token: \(peripheral.receivedHandshakeToken ?? "nil")")
             Text("Sent token: \(peripheral.sentHandshakeToken ?? "nil")")
             Text("Agreed on sent token: \(peripheral.shouldUseSentToken() ?? false ? "yes" : "no")")

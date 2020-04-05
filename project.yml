@@ -3,6 +3,7 @@ options:
   bundleIdPrefix: com.dist-contact-tracing.app
 settings:
   DEVELOPMENT_TEAM: VDQM747B3N
+  SWIFT_OBJC_BRIDGING_HEADER: src/MySharedAir-Bridging-Header.h
 targets:
   MySharedAir:
     type: application
